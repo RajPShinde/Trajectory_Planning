@@ -14,25 +14,6 @@ VehicleModel::VehicleModel(const IlqrConfig& config, const VehicleParam& param, 
 void VehicleModel::DynamicsJacbian(const State& state, const Control& control, SystemMatrix* const A, InputMatrix* const B) {
 
   double L = param_.wheel_base;
-  // Euler Method is too poor.
-  // double theta = state(2, 0);
-  // double delta = state(5, 0);
-  // double v = state(3, 0);
-
-  // *A << 1.0, 0.0, -std::sin(theta) * v * delta_t_, std::cos(theta) * delta_t_, 0.0, 0.0,
-  //       0.0, 1.0, std::cos(theta) * v * delta_t_, std::sin(theta) * delta_t_, 0.0, 0.0,
-  //       0.0, 0.0, 1.0, std::tan(delta) / L * delta_t_, 0.0, v * delta_t_ * (1.0 + std::pow(std::tan(delta), 2)) / L,
-  //       0.0, 0.0, 0.0, 1.0, delta_t_, 0.0,
-  //       0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
-  //       0.0, 0.0, 0.0, 0.0, 0.0, 1.0;
-
-  // *B << 0.0, 0.0,
-  //       0.0, 0.0,
-  //       0.0, 0.0,
-  //       0.0, 0.0,
-  //       delta_t_, 0.0,
-  //       0.0, delta_t_;
-
   double v = state(3, 0);
   double theta = math::NormalizeAngle(state(2, 0));
   double delta = math::NormalizeAngle(state(5, 0));
@@ -77,36 +58,47 @@ void VehicleModel::DynamicsJacbian(const State& state, const Control& control, S
         0.0, delta_t_;
 }
 
-void VehicleModel::Dynamics(
-    const State& state, const Control& control,
-    State* const next_state) {
-  // std::cout << "current state: " << state << std::endl;
-  // std::cout << "control: " << control << std::endl;
-  // SystemMatrix A;
-  // InputMatrix B;
-  // DynamicsJacbian(state, control, &A, &B);
-  // *next_state = A * state + B * control;
-
-  // State inc;
-  // inc << state(3, 0) * std::cos(state(2, 0)) * delta_t_,
-  //        state(3, 0) * std::sin(state(2, 0)) * delta_t_,
-  //        state(3, 0) * std::tan(state(2, 0)) / param_.wheel_base * delta_t_,
-  //        state(4, 0) * delta_t_,
-  //        control(0, 0) * delta_t_,
-  //        control(1, 0) * delta_t_;
-  // *next_state = state + inc;
-  
-  double theta = state(2, 0);
-  double v = state(3, 0);
-  double a = state(4, 0);
-  double delta = state(5, 0);
-  
+void VehicleModel::Dynamics(const State& state, const Control& control, State* const next_state) {
   State k1 = DynamicsContinuous(state, control);
   State mid_state = state + 0.5 * delta_t_ * k1;
   State k2 = DynamicsContinuous(mid_state, control);
   *next_state = state + delta_t_ * k2;
   (*next_state)(2, 0) = math::NormalizeAngle((*next_state)(2, 0));
   (*next_state)(5, 0) = math::NormalizeAngle((*next_state)(5, 0));
+}
+
+void VehicleModel::DynamicsFE(const State& state, const Control& control, State* const next_state){
+  State inc;
+  inc << state(3, 0) * std::cos(state(2, 0)) * delta_t_,
+         state(3, 0) * std::sin(state(2, 0)) * delta_t_,
+         state(3, 0) * std::tan(state(2, 0)) / param_.wheel_base * delta_t_,
+         state(4, 0) * delta_t_,
+         control(0, 0) * delta_t_,
+         control(1, 0) * delta_t_;
+
+  *next_state = state + inc;
+}
+
+void VehicleModel::DynamicsJacbianFE(const State& state, const Control& control, SystemMatrix* const A, InputMatrix* const B) {
+
+  double L = param_.wheel_base;
+  double theta = state(2, 0);
+  double delta = state(5, 0);
+  double v = state(3, 0);
+
+  *A << 1.0, 0.0, -std::sin(theta) * v * delta_t_, std::cos(theta) * delta_t_, 0.0, 0.0,
+        0.0, 1.0, std::cos(theta) * v * delta_t_, std::sin(theta) * delta_t_, 0.0, 0.0,
+        0.0, 0.0, 1.0, std::tan(delta) / L * delta_t_, 0.0, v * delta_t_ * (1.0 + std::pow(std::tan(delta), 2)) / L,
+        0.0, 0.0, 0.0, 1.0, delta_t_, 0.0,
+        0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
+        0.0, 0.0, 0.0, 0.0, 0.0, 1.0;
+
+  *B << 0.0, 0.0,
+        0.0, 0.0,
+        0.0, 0.0,
+        0.0, 0.0,
+        delta_t_, 0.0,
+        0.0, delta_t_;
 }
 
 State VehicleModel::DynamicsContinuous(

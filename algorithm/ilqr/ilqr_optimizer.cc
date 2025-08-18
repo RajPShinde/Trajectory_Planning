@@ -124,7 +124,7 @@ ilqr::SolverStatus IlqrOptimizer::Optimize(const TrajectoryPoint& start_state,
 
   al_lambda_ = std::vector<double>(al_size, 0);
   rho_ = std::vector<double>(al_size, 1);
-  double rho_factor = 3;
+  double rho_factor = 1.1;
   double rho_max = 1e6;
   double constraint_tolerance = 1e-2;
 
@@ -142,10 +142,10 @@ ilqr::SolverStatus IlqrOptimizer::Optimize(const TrajectoryPoint& start_state,
   LOG_INFO_STREAM("init cost: " << cost_old);
 
   // Check Initial Guess
-  // if(std::isnan(cost_old) || cost_old > 1e+4){
-  //   LOG_ERROR("LQR Initial Guess or DP Planner Coarse Trajectory Invalid");
-  //   return status;
-  // }
+  if(std::isnan(cost_old) || cost_old > 1e+4){
+    LOG_ERROR("LQR Initial Guess Invalid");
+    return status;
+  }
 
   // Initializing variables for iLQR
   std::vector<Eigen::Matrix<double, kControlNum, kStateNum>> Ks(num_of_knots_ - 1);
@@ -161,8 +161,7 @@ ilqr::SolverStatus IlqrOptimizer::Optimize(const TrajectoryPoint& start_state,
   double z = 0.0;
   double cost_new = 0.0;
 
-  static std::vector<double> alpha_list_{1.0000, 0.5012, 0.2512, 0.1259, 0.0631, 0.0316, 0.0158, 0.0079, 0.0040, 0.0020, 0.0010};
-
+  static std::array<double, 11> alpha_list_{1.0000, 0.5012, 0.2512, 0.1259, 0.0631, 0.0316, 0.0158, 0.0079, 0.0040, 0.0020, 0.0010};
   
   // AL Loop
   for (int outer_iter = 1; outer_iter <= config_.max_outer_iter_num; ++outer_iter) {
@@ -484,26 +483,27 @@ bool IlqrOptimizer::Backward(
     auto Quu = cost_Hu[i] + Bs[i].transpose() * Vxx * Bs[i];
     auto Qux = Bs[i].transpose() * Vxx * As[i]; 
 
-    // auto Quu_tem = Quu + lambda * Eigen::MatrixXd::Identity(kControlNum, kControlNum);
-
-    // auto Quu_sym = 0.5 * (Quu_tem + Quu_tem.transpose());
-    // Eigen::LLT<Eigen::MatrixXd> Quu_fact(Quu_sym);
-    // if (Quu_fact.info() != Eigen::Success) {
-    //   LOG_WARN("Backward Pass: LLT decomposition failed in iqr, matrix is not positive definite.");
-    //   return true;
-    // }
-
-    // Ks->at(i) = -Qux;
-    // ks->at(i) = -Qu;
-    // Quu_fact.solveInPlace(Ks->at(i));
-    // Quu_fact.solveInPlace(ks->at(i));
-
+    // Regularize
     auto Quu_tem = Quu + lambda * Eigen::MatrixXd::Identity(kControlNum, kControlNum);
 
-    auto Quu_inv = Quu_tem.inverse();
+    auto Quu_sym = 0.5 * (Quu_tem + Quu_tem.transpose());
+    Eigen::LLT<Eigen::MatrixXd> Quu_fact(Quu_tem);
+    if (Quu_fact.info() != Eigen::Success) {
+      LOG_WARN("Backward Pass: LLT decomposition failed in iqr, matrix is not positive definite.");
+      return true;
+    }
 
-    Ks->at(i) = -Quu_inv * Qux;
-    ks->at(i) = -Quu_inv * Qu;
+    Ks->at(i) = -Qux;
+    ks->at(i) = -Qu;
+    Quu_fact.solveInPlace(Ks->at(i));
+    Quu_fact.solveInPlace(ks->at(i));
+
+    // auto Quu_tem = Quu + lambda * Eigen::MatrixXd::Identity(kControlNum, kControlNum);
+
+    // auto Quu_inv = Quu_tem.inverse();
+
+    // Ks->at(i) = -Quu_inv * Qux;
+    // ks->at(i) = -Quu_inv * Qu;
 
     Vx = Qx + Ks->at(i).transpose() * Quu * ks->at(i) + Ks->at(i).transpose() * Qu + Qux.transpose() * ks->at(i);
     Vxx = Qxx + Ks->at(i).transpose() * Quu * Ks->at(i) + Ks->at(i).transpose() * Qux + Qux.transpose() * Ks->at(i);

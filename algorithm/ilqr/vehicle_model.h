@@ -26,16 +26,14 @@ class VehicleModel {
     const double horizon, 
     const double dt);
 
+  void DynamicsJacbian(const State& state, const Control& control, SystemMatrix* const A, InputMatrix* const B);
 
-  void DynamicsJacbian(
-      const State& state, const Control& control,
-      SystemMatrix* const A, InputMatrix* const B);
+  void Dynamics(const State& state, const Control& control, State* const next_state);
 
-  void Dynamics(
-      const State& state, const Control& control,
-      State* const next_state);
-
+  void DynamicsFE(const State& state, const Control& control, State* const next_state);
   
+  void DynamicsJacbianFE(const State& state, const Control& control, SystemMatrix* const A, InputMatrix* const B);
+
  private:
 
   State DynamicsContinuous(
