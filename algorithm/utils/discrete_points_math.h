@@ -23,7 +23,7 @@
 #include <utility>
 #include <vector>
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 
 class DiscretePointsMath {
  public:
@@ -39,4 +39,4 @@ class DiscretePointsMath {
       std::vector<double>* kappas);
 };
 
-}  // namespace trajectory_optimization
+}  // namespace trajectory_planning

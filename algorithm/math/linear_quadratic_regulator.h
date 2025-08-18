@@ -28,7 +28,7 @@
  * @brief apollo::common::math
  */
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 namespace math {
 
 /**
@@ -65,4 +65,4 @@ void SolveLQRProblem(const Eigen::MatrixXd &A, const Eigen::MatrixXd &B,
                      Eigen::MatrixXd *ptr_K);
 
 }  // namespace math
-}  // namespace trajectory_optimization
+}  // namespace trajectory_planning

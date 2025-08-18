@@ -5,7 +5,7 @@
 
 #include "algorithm/math/vec2d.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 namespace math {
 
 class Pose {

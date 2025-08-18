@@ -8,7 +8,7 @@
 #include "algorithm/math/math_utils.h"
 #include "algorithm/utils/timer.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 
 IlqrOptimizer::IlqrOptimizer(const IlqrConfig& config, const VehicleParam& param, const double horizon, const double dt) : config_(config),
                                                                                                                            vehicle_param_(param), 
@@ -1108,4 +1108,4 @@ void IlqrOptimizer::iqr(
   }
 }
 
-} // namespace trajectory_optimization
+} // namespace trajectory_planning

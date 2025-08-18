@@ -26,7 +26,7 @@
 
 #include "algorithm/math/math_utils.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 namespace math {
 
 Polygon2d::Polygon2d(const Box2d &box) {
@@ -619,4 +619,4 @@ Polygon2d Polygon2d::ExpandByDistance(const double distance) const {
 }
 
 }  // namespace math
-}  // namespace trajectory_optimization
+}  // namespace trajectory_planning

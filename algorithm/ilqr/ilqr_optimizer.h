@@ -10,7 +10,7 @@
 #include "algorithm/ilqr/typedefs.h"
 #include "algorithm/ilqr/logger.hpp"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 
 struct Cost {
   double total_cost = 0.0;
@@ -173,4 +173,4 @@ class IlqrOptimizer {
   double delta_V_[2];
 };
 
-} // namespace trajectory_optimization
+} // namespace trajectory_planning

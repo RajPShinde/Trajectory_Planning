@@ -17,7 +17,7 @@
 
 #include "algorithm/math/vec2d.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 
 struct StartState {
   double x, y, theta, v, phi, a, omega;
@@ -92,4 +92,4 @@ class DiscretizedTrajectory {
   std::vector<TrajectoryPoint> trajectory_;
 };
 
-} // namespace trajectory_optimization
+} // namespace trajectory_planning

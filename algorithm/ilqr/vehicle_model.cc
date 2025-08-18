@@ -6,7 +6,7 @@
 
 #include "algorithm/math/math_utils.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 
 VehicleModel::VehicleModel(const IlqrConfig& config, const VehicleParam& param, const double horizon, const double dt)
                           : config_(config), param_(param), horizon_(horizon), delta_t_(dt) {}
@@ -126,4 +126,4 @@ State VehicleModel::DynamicsContinuous(
   return res;
 }
 
-} // namespace trajectory_optimization
+} // namespace trajectory_planning

@@ -13,7 +13,7 @@
 
 #include "algorithm/params/vehicle_param.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 
 struct LateralTrackerConfig {
   double weight_l = 1e-1;
@@ -189,4 +189,4 @@ struct PlannerConfig {
   TrackerConfig tracker_config;
 };
 
-} // namespace trajectory_optimization
+} // namespace trajectory_planning

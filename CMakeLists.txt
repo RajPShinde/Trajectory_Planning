@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(trajectory_optimization)
+project(trajectory_planning)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_BUILD_TYPE Debug)
@@ -33,7 +33,7 @@ add_message_files(
 generate_messages(DEPENDENCIES std_msgs geometry_msgs)
 
 catkin_package(
-  LIBRARIES trajectory_optimization
+  LIBRARIES trajectory_planning
   CATKIN_DEPENDS roscpp message_runtime
 )
 
@@ -83,10 +83,10 @@ set(SRC
   algorithm/ilqr/tracker.cc
   algorithm/ilqr/logger.cpp)
 
-add_executable(trajectoryOptimization  main.cc ${SRC})
-set_target_properties(trajectoryOptimization PROPERTIES OUTPUT_NAME node PREFIX "")
-add_dependencies(trajectoryOptimization ${catkin_EXPORTED_TARGETS})
-target_link_libraries(trajectoryOptimization
+add_executable(trajectory_planning  main.cc ${SRC})
+set_target_properties(trajectory_planning PROPERTIES OUTPUT_NAME node PREFIX "")
+add_dependencies(trajectory_planning ${catkin_EXPORTED_TARGETS})
+target_link_libraries(trajectory_planning
   ${catkin_LIBRARIES}
   ${OpenCV_LIBS}
   ${PYTHON_LIBRARIES}

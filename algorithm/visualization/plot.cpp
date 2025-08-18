@@ -11,7 +11,7 @@
 
 #include "algorithm/visualization/plot.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 namespace visualization {
 namespace {
 std::string frame_ = "map";

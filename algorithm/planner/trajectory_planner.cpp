@@ -17,7 +17,7 @@
 #include "algorithm/utils/timer.h"
 #include "algorithm/visualization/figure_plot.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 
 TrajectoryPlanner::TrajectoryPlanner(const PlannerConfig& config, const Env& env): config_(config), 
                                                                                    dp_(config, env), 
@@ -161,4 +161,4 @@ bool TrajectoryPlanner::Plan(const StartState& state, DiscretizedTrajectory& res
 
   return true;
 }
-} // namespace trajectory_optimization
+} // namespace trajectory_planning

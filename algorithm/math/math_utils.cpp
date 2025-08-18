@@ -20,7 +20,7 @@
 #include <math.h>
 #include <utility>
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 namespace math {
 
 double Sqr(const double x) { return x * x; }
@@ -99,4 +99,4 @@ std::vector<double> ToContinuousAngle(const std::vector<double> &angle) {
 }
 
 }  // namespace math
-}  // namespace trajectory_optimization
+}  // namespace trajectory_planning

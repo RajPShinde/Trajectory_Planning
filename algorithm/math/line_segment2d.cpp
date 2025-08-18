@@ -22,7 +22,7 @@
 
 #include "algorithm/math/math_utils.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 namespace math {
 namespace {
 
@@ -248,4 +248,4 @@ std::vector<Vec2d> LineSegment2d::SamplePoints(double step) {
 }
 
 }  // namespace math
-}  // namespace trajectory_optimization
+}  // namespace trajectory_planning

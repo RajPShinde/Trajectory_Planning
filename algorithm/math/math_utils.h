@@ -34,7 +34,7 @@
  * @namespace apollo::common::math
  * @brief apollo::common::math
  */
-namespace trajectory_optimization {
+namespace trajectory_planning {
 namespace math {
 
 double Sqr(const double x);
@@ -279,4 +279,4 @@ inline std::vector<double> ARange(double start, double end, double step) {
 }
 
 }  // namespace math
-}  // namespace trajectory_optimization
+}  // namespace trajectory_planning

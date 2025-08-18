@@ -22,7 +22,7 @@
 
 #include "algorithm/math/math_utils.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 namespace math {
 
 AABox2d::AABox2d(const Vec2d &center, const double length, const double width)
@@ -144,4 +144,4 @@ void AABox2d::MergeFrom(const Vec2d &other_point) {
 }
 
 }  // namespace math
-}  // namespace trajectory_optimization
+}  // namespace trajectory_planning

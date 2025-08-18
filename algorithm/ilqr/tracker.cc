@@ -7,7 +7,7 @@
 #include "algorithm/math/math_utils.h"
 #include "algorithm/math/linear_quadratic_regulator.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 
 bool Tracker::Plan(
     const TrajectoryPoint& start_state,
@@ -214,4 +214,4 @@ bool Tracker::lqr(
   return true;
 }
 
-} // namespace trajectory_optimization
+} // namespace trajectory_planning

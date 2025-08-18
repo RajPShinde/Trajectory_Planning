@@ -12,7 +12,7 @@
 #include "algorithm/visualization/color.h"
 #include <cmath>
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 namespace visualization {
 
 Color Color::Black(0.0, 0.0, 0.0);

@@ -22,7 +22,7 @@
 #include "algorithm/utils/environment.h"
 #include "algorithm/params/planner_config.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 
 constexpr int NT = 5;
 constexpr int NS = 7;
@@ -97,4 +97,4 @@ class DpPlanner {
 };
 
 
-} // namespace trajectory_optimization
+} // namespace trajectory_planning

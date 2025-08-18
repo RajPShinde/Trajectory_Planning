@@ -4,7 +4,7 @@
 
 #include "algorithm/math/math_utils.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 
 PlanningNode::PlanningNode(const ros::NodeHandle& nh) : nh_(nh) {
 
@@ -148,4 +148,4 @@ std::array<math::Box2d, 4> PlanningNode::GenerateTireBoxes(const math::Pose& pos
   };
 }
 
-} // namespace trajectory_optimization
+} // namespace trajectory_planning

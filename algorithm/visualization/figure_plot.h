@@ -14,7 +14,7 @@
 
 namespace plt = matplotlibcpp;
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 namespace visualization {
 
 class FigurePlot {
@@ -505,4 +505,4 @@ class FigurePlot {
 };
 
 } // namespace visualization
-} // namespace trajectory_optimization
+} // namespace trajectory_planning

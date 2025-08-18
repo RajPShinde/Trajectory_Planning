@@ -16,7 +16,7 @@
 
 #include "algorithm/math/math_utils.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 
 using math::Vec2d;
 
@@ -195,4 +195,4 @@ Vec2d DiscretizedTrajectory::GetCartesian(
   return {ref.x - lateral * std::sin(ref.theta), ref.y + lateral * std::cos(ref.theta)};
 }
 
-} // namespace trajectory_optimization
+} // namespace trajectory_planning

@@ -5,7 +5,7 @@
 #include <iostream>
 
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 
 template<std::size_t N>
 class ConstraintPenaltyFunction {
@@ -102,4 +102,4 @@ class AugmentedLagrangian {
   }
 };
 
-} // namespace trajectory_optimization
+} // namespace trajectory_planning

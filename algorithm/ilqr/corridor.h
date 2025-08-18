@@ -13,7 +13,7 @@
 #include "algorithm/utils/environment.h"
 #include "algorithm/math/line_segment2d.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 
 using ConvexPolygon = std::vector<Eigen::Vector2d>;
 using ConvexPolygons = std::vector<ConvexPolygon>;
@@ -91,4 +91,4 @@ class Corridor {
   std::vector<std::vector<math::Vec2d>> points_for_corridors_;
 };
 
-} // namespace trajectory_optimization
+} // namespace trajectory_planning

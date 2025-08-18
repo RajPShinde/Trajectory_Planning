@@ -17,7 +17,7 @@
 #include "algorithm/ilqr/ilqr_optimizer.h"
 #include "algorithm/utils/discretized_trajectory.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 
 class TrajectoryPlanner {
  public:
@@ -53,4 +53,4 @@ private:
   std::vector<math::LineSegment2d> right_lane_boundary_;
 };
 
-} // namespace trajectory_optimization
+} // namespace trajectory_planning

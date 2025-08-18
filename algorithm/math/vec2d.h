@@ -27,7 +27,7 @@
  * @namespace apollo::common::math
  * @brief apollo::common::math
  */
-namespace trajectory_optimization {
+namespace trajectory_planning {
 namespace math {
 
 constexpr double kMathEpsilon = 1e-10;
@@ -126,4 +126,4 @@ protected:
 Vec2d operator*(const double ratio, const Vec2d &vec);
 
 }  // namespace math
-}  // namespace trajectory_optimization
+}  // namespace trajectory_planning

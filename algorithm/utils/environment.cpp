@@ -13,7 +13,7 @@
 
 #include "algorithm/visualization/plot.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 
 constexpr double kSampleStep = 0.1;
 
@@ -214,4 +214,4 @@ void Environment::Visualize() {
   visualization::Trigger();
 }
 
-} // namespace trajectory_optimization
+} // namespace trajectory_planning

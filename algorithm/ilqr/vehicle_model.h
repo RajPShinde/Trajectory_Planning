@@ -6,7 +6,7 @@
 
 #include "algorithm/params/planner_config.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 
 constexpr int kStateNum = 6;
 constexpr int kControlNum = 2;
@@ -51,4 +51,4 @@ class VehicleModel {
 
 };
   
-} // namespace trajectory_optimization
+} // namespace trajectory_planning

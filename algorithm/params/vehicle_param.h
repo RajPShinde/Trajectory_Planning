@@ -16,7 +16,7 @@
 #include "algorithm/math/pose.h"
 #include "algorithm/math/box2d.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 
 class VehicleParam {
  public:
@@ -103,4 +103,4 @@ class VehicleParam {
 
 };
 
-} // namespace trajectory_optimization
+} // namespace trajectory_planning

@@ -22,7 +22,7 @@
 
 #include <cmath>
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 
 bool DiscretePointsMath::ComputePathProfile(
     const double dt,
@@ -175,4 +175,4 @@ bool DiscretePointsMath::ComputePathProfile(
   return true;
 }
 
-}  // namespace trajectory_optimization
+}  // namespace trajectory_planning

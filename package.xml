@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>trajectory_optimization</name>
+  <name>trajectory_planning</name>
   <version>1.0.0</version>
   <description>Trajectory Optimization using AL-iLQR</description>
   <maintainer email="rajprakashshinde07@gmail.com">Raj Shinde</maintainer>

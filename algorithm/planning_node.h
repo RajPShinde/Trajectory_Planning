@@ -1,14 +1,14 @@
 #include <ros/ros.h>
 
 #include "geometry_msgs/PoseStamped.h"
-#include "trajectory_optimization/CenterLine.h"
-#include "trajectory_optimization/Obstacles.h"
-#include "trajectory_optimization/DynamicObstacles.h"
+#include "trajectory_planning/CenterLine.h"
+#include "trajectory_planning/Obstacles.h"
+#include "trajectory_planning/DynamicObstacles.h"
 
 #include "algorithm/planner/trajectory_planner.h"
 #include "algorithm/visualization/plot.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 
 class PlanningNode {
  public:

@@ -8,7 +8,7 @@
 #include "algorithm/params/vehicle_param.h"
 #include "algorithm/utils/discretized_trajectory.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 
 class Tracker {
  public:
@@ -107,4 +107,4 @@ class Tracker {
   Eigen::Matrix<double, 1, 1> longitudinal_R_ = Eigen::MatrixXd::Zero(1, 1);
 };
 
-} // namespace trajectory_optimization
+} // namespace trajectory_planning

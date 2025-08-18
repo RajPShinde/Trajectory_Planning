@@ -2,7 +2,7 @@
 
 #include <chrono>
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 namespace utils {
 
 // 毫秒 1 s = 1000 ms
@@ -18,4 +18,4 @@ static inline double Duration(const time& start, const time& end) {
 }
 
 } // namespace utils
-} // namespace trajectory_optimization
+} // namespace trajectory_planning

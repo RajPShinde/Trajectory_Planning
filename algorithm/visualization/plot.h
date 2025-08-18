@@ -24,7 +24,7 @@
 
 #include "algorithm/visualization/color.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 namespace visualization {
 
 using math::Vec2d;
@@ -94,4 +94,4 @@ void Trigger();
 void Clear();
 } // namespace visualization
 
-} // namespace trajectory_optimization
+} // namespace trajectory_planning

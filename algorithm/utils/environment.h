@@ -19,7 +19,7 @@
 #include "algorithm/params/vehicle_param.h"
 #include "algorithm/params/planner_config.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 
 class Environment {
  public:
@@ -87,4 +87,4 @@ class Environment {
 
 using Env = std::shared_ptr<Environment>;
 
-} // namespace trajectory_optimization
+} // namespace trajectory_planning

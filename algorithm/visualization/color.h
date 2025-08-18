@@ -21,7 +21,7 @@
 
 using std_msgs::ColorRGBA;
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 namespace visualization {
 
 class Color {

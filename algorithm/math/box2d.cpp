@@ -23,7 +23,7 @@
 #include "algorithm/math/math_utils.h"
 #include "algorithm/math/polygon2d.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 namespace math {
 namespace {
 
@@ -333,4 +333,4 @@ void Box2d::LateralExtend(const double extension_length) {
 }
 
 }  // namespace math
-}  // namespace trajectory_optimization
+}  // namespace trajectory_planning

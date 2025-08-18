@@ -20,7 +20,7 @@
 #include "algorithm/visualization/plot.h"
 #include "algorithm/utils/discrete_points_math.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 
 using math::Pose;
 using math::Vec2d;
@@ -319,4 +319,4 @@ std::vector<Vec2d> DpPlanner::InterpolateLinearly(
   return result;
 }
 
-} // namespace trajectory_optimization
+} // namespace trajectory_planning

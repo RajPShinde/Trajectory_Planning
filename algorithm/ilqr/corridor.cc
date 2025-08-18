@@ -4,7 +4,7 @@
 
 #include "algorithm/visualization/plot.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 
 Corridor::Corridor(const CorridorConfig& config, const Env& env) 
     : config_(config), env_(env) {}
@@ -404,4 +404,4 @@ std::pair<Eigen::Vector3d, math::LineSegment2d> Corridor::FindNeastLaneSegment(
   return lane_segs[min_index];
 }
 
-} // namespace trajectory_optimization
+} // namespace trajectory_planning

@@ -33,7 +33,7 @@
  * @namespace apollo::common::math
  * @brief apollo::common::math
  */
-namespace trajectory_optimization {
+namespace trajectory_planning {
 namespace math {
 
 /**
@@ -341,4 +341,4 @@ protected:
 };
 
 }  // namespace math
-}  // namespace trajectory_optimization
+}  // namespace trajectory_planning

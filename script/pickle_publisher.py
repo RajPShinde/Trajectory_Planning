@@ -13,7 +13,7 @@ import pickle
 import sys
 import rospy
 from os import path
-from planning.msg import CenterLine, Obstacles, DynamicObstacles
+from trajectory_planning.msg import CenterLine, Obstacles, DynamicObstacles
 from nav_msgs.msg import Path
 from geometry_msgs.msg import PoseStamped
 

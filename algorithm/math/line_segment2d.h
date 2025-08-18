@@ -30,7 +30,7 @@
  * @namespace apollo::common::math
  * @brief apollo::common::math
  */
-namespace trajectory_optimization {
+namespace trajectory_planning {
 namespace math {
 
 /**
@@ -232,4 +232,4 @@ private:
 };
 
 }  // namespace math
-}  // namespace trajectory_optimization
+}  // namespace trajectory_planning

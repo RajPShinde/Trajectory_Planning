@@ -21,7 +21,7 @@
 
 #include "algorithm/math/linear_quadratic_regulator.h"
 
-namespace trajectory_optimization {
+namespace trajectory_planning {
 namespace math {
 
 using Matrix = Eigen::MatrixXd;
@@ -79,4 +79,4 @@ void SolveLQRProblem(const Matrix &A, const Matrix &B, const Matrix &Q,
 }
 
 }  // namespace math
-}  // namespace trajectory_optimization
+}  // namespace trajectory_planning
