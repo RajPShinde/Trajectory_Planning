@@ -53,16 +53,16 @@ bool IlqrOptimizer::Plan(
   if (corridor.size() == 0 ||
       left_lane_cons.size() == 0 || 
       right_lane_cons.size() == 0) {
-    LOG_ERROR("ilqr input constraints error");
+    LOG_ERROR("iLQR Input Constraints Error");
     return false;
   }
 
   if (num_of_knots_ != coarse_traj.trajectory().size()) {
-    LOG_ERROR("ilqr input coarse_traj error");
+    LOG_ERROR("iLQR Input Trajectory Error");
     return false;
   }
 
-  LOG_INFO_STREAM("no_of_knots_: " << num_of_knots_);
+  LOG_INFO_STREAM("No of Knots: " << num_of_knots_);
 
   utils::time ilqr_start_time = utils::Time();
   TransformGoals(coarse_traj);
@@ -71,7 +71,7 @@ bool IlqrOptimizer::Plan(
 
   utils::time ilqr_end_time = utils::Time();
   double ilqr_time_cost = utils::Duration(ilqr_start_time, ilqr_end_time);
-  LOG_INFO_STREAM("ilqr time cost: " << ilqr_time_cost);
+  LOG_INFO_STREAM("iLQR Time Cost: " << ilqr_time_cost);
 }
 
 void IlqrOptimizer::CalculateDiscRadius() {
@@ -124,7 +124,7 @@ ilqr::SolverStatus IlqrOptimizer::Optimize(const TrajectoryPoint& start_state,
 
   al_lambda_ = std::vector<double>(al_size, 0);
   rho_ = std::vector<double>(al_size, 1);
-  double rho_factor = 1.05;
+  double rho_factor = 1.1;
   double rho_max = 1e6;
   double constraint_tolerance = 1e-2;
 
@@ -139,7 +139,7 @@ ilqr::SolverStatus IlqrOptimizer::Optimize(const TrajectoryPoint& start_state,
   Cost cost_data;
   double cost_old = TotalCost(states, controls, &cost_data);
   cost_.push_back(cost_data);
-  LOG_INFO_STREAM("init cost: " << cost_old);
+  LOG_INFO_STREAM("Initial Cost: " << cost_old);
 
   // Check Initial Guess
   if(std::isnan(cost_old) || cost_old > 1e+4){
@@ -155,17 +155,17 @@ ilqr::SolverStatus IlqrOptimizer::Optimize(const TrajectoryPoint& start_state,
 
   bool is_forward_pass_updated = true;
 
-  double dcost = 0.0;
-  double lambda = 1.0;
-  double dlambda = 1.0;
-  double z = 0.0;
-  double cost_new = 0.0;
-
   static std::array<double, 11> alpha_list_{1.0000, 0.5012, 0.2512, 0.1259, 0.0631, 0.0316, 0.0158, 0.0079, 0.0040, 0.0020, 0.0010};
   
   // AL Loop
   for (int outer_iter = 1; outer_iter <= config_.max_outer_iter_num; ++outer_iter) {
     LOG_INFO_STREAM("AL Iteration: " << outer_iter);
+
+    double dcost = 0.0;
+    double lambda = 1.0;
+    double dlambda = 1.0;
+    double z = 0.0;
+    double cost_new = 0.0;
 
     // Initial Cost Calculation
     cost_old = TotalCost(states, controls, &cost_data);
@@ -202,7 +202,7 @@ ilqr::SolverStatus IlqrOptimizer::Optimize(const TrajectoryPoint& start_state,
           // Increase regularization
           dlambda = std::fmax(dlambda * options_.regularization_ratio, options_.regularization_ratio);
           lambda = std::fmax(lambda * dlambda, options_.regularization_min);
-          
+
           if (lambda > options_.regularization_max) {
             LOG_ERROR("Backward Pass: Ilqr Solver Failed: lambda > options_.regularization_max!");
             TotalCost(states, controls, true);
@@ -259,7 +259,7 @@ ilqr::SolverStatus IlqrOptimizer::Optimize(const TrajectoryPoint& start_state,
       if (is_forward_pass_done) {
         // Decrease Regularization
         dlambda = std::fmin(dlambda / options_.regularization_ratio, 1.0 / options_.regularization_ratio);
-        lambda = lambda * dlambda * (lambda > options_.regularization_min);
+        lambda = std::fmax(lambda * dlambda, options_.regularization_min);
 
         is_forward_pass_updated = true;
         LOG_INFO_STREAM("Forward Pass Done");
