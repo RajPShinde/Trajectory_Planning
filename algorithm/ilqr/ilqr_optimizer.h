@@ -7,6 +7,7 @@
 #include "algorithm/utils/discretized_trajectory.h"
 #include "algorithm/ilqr/vehicle_model.h"
 #include "algorithm/ilqr/barrier_function.h"
+#include "algorithm/ilqr/augmented_lagrangian.h"
 #include "algorithm/ilqr/typedefs.h"
 #include "algorithm/ilqr/logger.hpp"
 

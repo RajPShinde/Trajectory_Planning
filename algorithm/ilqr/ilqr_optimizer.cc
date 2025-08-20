@@ -124,7 +124,7 @@ ilqr::SolverStatus IlqrOptimizer::Optimize(const TrajectoryPoint& start_state,
 
   al_lambda_ = std::vector<double>(al_size, 0);
   rho_ = std::vector<double>(al_size, 1);
-  double rho_factor = 1.1;
+  double rho_factor = 1.05;
   double rho_max = 1e6;
   double constraint_tolerance = 1e-2;
 
@@ -323,14 +323,12 @@ ilqr::SolverStatus IlqrOptimizer::Optimize(const TrajectoryPoint& start_state,
     else{
       // Update the Augmented Lagrangian lambda and rho
       for(int v = 0; v < h_values.size(); v++){
-        if(h_values[v].first == ilqr::ConstraintType::kInEquality){
+        if(h_values[v].first == ilqr::ConstraintType::kInEquality)
           al_lambda_[v] = std::fmax(0.0, al_lambda_[v] + rho_[v] * h_values[v].second);
-          if (rho_[v] < rho_max) {
-            rho_[v] *= rho_factor;
-          }
-        }
-        else{
-          // TO-DO: Add update rule for Equality Constraints.
+        else
+          al_lambda_[v] = al_lambda_[v] + rho_[v] * h_values[v].second;
+        if (rho_[v] < rho_max) {
+          rho_[v] *= rho_factor;
         }
       }
     }
@@ -358,28 +356,28 @@ std::vector<std::pair<ilqr::ConstraintType, double>> IlqrOptimizer::GetAllConstr
   // State Constraints
   for (int i = 0; i < num_of_knots_; i++) {
     // Vmin - V <= 0
-    // V - Vmax >= 0
-    // a_min - a <= 0
-    // a - a_max <= 0
-    // delta_min - delta <= 0
-    // delta - delta_max <= 0
     h_values.push_back(std::make_pair(ilqr::ConstraintType::kInEquality, vehicle_param_.min_velocity -states[i](3, 0)));
+    // V - Vmax >= 0
     h_values.push_back(std::make_pair(ilqr::ConstraintType::kInEquality, states[i](3, 0) - vehicle_param_.max_velocity));
+    // a_min - a <= 0
     h_values.push_back(std::make_pair(ilqr::ConstraintType::kInEquality, vehicle_param_.min_acceleration - states[i](4, 0)));
+    // a - a_max <= 0
     h_values.push_back(std::make_pair(ilqr::ConstraintType::kInEquality, states[i](4, 0) - vehicle_param_.max_acceleration));
+    // delta_min - delta <= 0
     h_values.push_back(std::make_pair(ilqr::ConstraintType::kInEquality, vehicle_param_.delta_min - states[i](5, 0)));
+    // delta - delta_max <= 0
     h_values.push_back(std::make_pair(ilqr::ConstraintType::kInEquality, states[i](5, 0) - vehicle_param_.delta_max));
   } 
 
   // Control Constraints
   for (int i = 0; i < num_of_knots_ - 1; i++) {
     // jerk_min - jerk <= 0
-    // jerk - jerk_max <= 0
-    // delta_rate_min - delta_rate <= 0
-    // delta_rate - delta_rate_max <= 0
     h_values.push_back(std::make_pair(ilqr::ConstraintType::kInEquality, vehicle_param_.jerk_min - controls[i](0, 0)));
+    // jerk - jerk_max <= 0
     h_values.push_back(std::make_pair(ilqr::ConstraintType::kInEquality, controls[i](0, 0) - vehicle_param_.jerk_max));
+    // delta_rate_min - delta_rate <= 0
     h_values.push_back(std::make_pair(ilqr::ConstraintType::kInEquality, vehicle_param_.delta_rate_min - controls[i](1, 0)));
+    // delta_rate - delta_rate_max <= 0
     h_values.push_back(std::make_pair(ilqr::ConstraintType::kInEquality, controls[i](1, 0) - vehicle_param_.delta_rate_max));
   }
 
@@ -462,14 +460,13 @@ double IlqrOptimizer::CalGradientNorm(const std::vector<Eigen::Matrix<double, kC
 }
 
 
-bool IlqrOptimizer::Backward(
-    const double lambda,
-    const std::vector<State>& states,
-    const std::vector<Control>& controls,
-    std::vector<Eigen::Matrix<double, kControlNum, kStateNum>>* const Ks,
-    std::vector<Eigen::Matrix<double, kControlNum, 1>>* const ks,
-    std::vector<Eigen::Matrix<double, kControlNum, 1>>* const Qus,
-    std::vector<Eigen::Matrix<double, kControlNum, kControlNum>>* const Quus) {
+bool IlqrOptimizer::Backward(const double lambda,
+                             const std::vector<State>& states,
+                             const std::vector<Control>& controls,
+                             std::vector<Eigen::Matrix<double, kControlNum, kStateNum>>* const Ks,
+                             std::vector<Eigen::Matrix<double, kControlNum, 1>>* const ks,
+                             std::vector<Eigen::Matrix<double, kControlNum, 1>>* const Qus,
+                             std::vector<Eigen::Matrix<double, kControlNum, kControlNum>>* const Quus) {
   delta_V_[0] = 0.0; delta_V_[1] = 0.0;
   Eigen::Matrix<double, kStateNum, 1> Vx = cost_Jx.back();
   Eigen::Matrix<double, kStateNum, kStateNum> Vxx = cost_Hx.back();
@@ -486,7 +483,9 @@ bool IlqrOptimizer::Backward(
     // Regularize
     auto Quu_tem = Quu + lambda * Eigen::MatrixXd::Identity(kControlNum, kControlNum);
 
+    // Make Symmetric
     auto Quu_sym = 0.5 * (Quu_tem + Quu_tem.transpose());
+
     Eigen::LLT<Eigen::MatrixXd> Quu_fact(Quu_tem);
     if (Quu_fact.info() != Eigen::Success) {
       LOG_WARN("Backward Pass: LLT decomposition failed in iqr, matrix is not positive definite.");
@@ -498,12 +497,6 @@ bool IlqrOptimizer::Backward(
     Quu_fact.solveInPlace(Ks->at(i));
     Quu_fact.solveInPlace(ks->at(i));
 
-    // auto Quu_tem = Quu + lambda * Eigen::MatrixXd::Identity(kControlNum, kControlNum);
-
-    // auto Quu_inv = Quu_tem.inverse();
-
-    // Ks->at(i) = -Quu_inv * Qux;
-    // ks->at(i) = -Quu_inv * Qu;
 
     Vx = Qx + Ks->at(i).transpose() * Quu * ks->at(i) + Ks->at(i).transpose() * Qu + Qux.transpose() * ks->at(i);
     Vxx = Qxx + Ks->at(i).transpose() * Quu * Ks->at(i) + Ks->at(i).transpose() * Qux + Qux.transpose() * Ks->at(i);
@@ -519,14 +512,13 @@ bool IlqrOptimizer::Backward(
 }
 
 
-void IlqrOptimizer::Forward(
-    const double alpha,
-    std::vector<State>* const states,
-    std::vector<Control>* const controls,
-    const std::vector<Eigen::Matrix<double, kControlNum, kStateNum>>& Ks,
-    const std::vector<Eigen::Matrix<double, kControlNum, 1>>& ks,
-    const std::vector<Eigen::Matrix<double, kControlNum, 1>>& Qus,
-    const std::vector<Eigen::Matrix<double, kControlNum, kControlNum>>& Quus) {
+void IlqrOptimizer::Forward(const double alpha,
+                            std::vector<State>* const states,
+                            std::vector<Control>* const controls,
+                            const std::vector<Eigen::Matrix<double, kControlNum, kStateNum>>& Ks,
+                            const std::vector<Eigen::Matrix<double, kControlNum, 1>>& ks,
+                            const std::vector<Eigen::Matrix<double, kControlNum, 1>>& Qus,
+                            const std::vector<Eigen::Matrix<double, kControlNum, kControlNum>>& Quus) {
   
   std::vector<State> new_state = *states;
   std::vector<Control> new_controls = *controls;
@@ -626,60 +618,7 @@ double IlqrOptimizer::TotalCost(const std::vector<State>& states, const std::vec
       LOG_INFO_STREAM("Violation on Constraint, Control c0:  " << c0_min << " [Min jerk: " << vehicle_param_.jerk_min << "]");
     if(c1_min <= vehicle_param_.delta_rate_min)
       LOG_INFO_STREAM("Violation on Constraint, Control c1:  " << c1_min << " [Min delta rate: " << vehicle_param_.delta_rate_min << "]");
-
-    double L = (vehicle_param_.rear_hang_length + vehicle_param_.wheel_base + vehicle_param_.front_hang_length) / config_.num_of_disc;
-    double rf = vehicle_param_.rear_hang_length;
-
-      int lane = 0;
-      int corridor = 0;
-      for(int i = 0; i < 15; i++){
-        Constraints cons = shrinked_corridor_[i];
-
-        if(h_values_[state_constraints_index_ + i*6 + 0].second >= 0)
-          LOG_INFO_STREAM("knot " << i << " h(x) vmin - v" << h_values_[state_constraints_index_ + i*6 + 0].second << " lambda " << al_lambda_[state_constraints_index_ + i*6 + 0] << " rho " << rho_[state_constraints_index_ + i*6 + 0]);
-        if(h_values_[state_constraints_index_ + i*6 + 1].second >= 0)
-          LOG_INFO_STREAM("knot " << i << " h(x) v - vmax" << h_values_[state_constraints_index_ + i*6 + 1].second << " lambda " << al_lambda_[state_constraints_index_ + i*6 + 1] << " rho " << rho_[state_constraints_index_ + i*6 + 1]);
-        if(h_values_[state_constraints_index_ + i*6 + 2].second >= 0)
-          LOG_INFO_STREAM("knot " << i << " h(x) amin - a" << h_values_[state_constraints_index_ + i*6 + 2].second << " lambda " << al_lambda_[state_constraints_index_ + i*6 + 2] << " rho " << rho_[state_constraints_index_ + i*6 + 2]);
-        if(h_values_[state_constraints_index_ + i*6 + 3].second >= 0)
-          LOG_INFO_STREAM("knot " << i << " h(x) a - amax" << h_values_[state_constraints_index_ + i*6 + 3].second << " lambda " << al_lambda_[state_constraints_index_ + i*6 + 3] << " rho " << rho_[state_constraints_index_ + i*6 + 3]);
-        if(h_values_[state_constraints_index_ + i*6 + 4].second >= 0)
-          LOG_INFO_STREAM("knot " << i << " h(x) dmin - d" << h_values_[state_constraints_index_ + i*6 + 4].second << " lambda " << al_lambda_[state_constraints_index_ + i*6 + 4] << " rho " << rho_[state_constraints_index_ + i*6 + 4]);
-        if(h_values_[state_constraints_index_ + i*6 + 5].second >= 0)
-          LOG_INFO_STREAM("knot " << i << " h(x) d - dmax" << h_values_[state_constraints_index_ + i*6 + 5].second << " lambda " << al_lambda_[state_constraints_index_ + i*6 + 5] << " rho " << rho_[state_constraints_index_ + i*6 + 5]);
-
-
-        if(h_values_[control_constraints_index_ + i*4 + 0].second >= 0)
-          LOG_INFO_STREAM("knot " << i << " h(x) jmin - j " << h_values_[control_constraints_index_ + i*4 + 0].second << " lambda " << al_lambda_[control_constraints_index_ + i*4 + 0] << " rho " << rho_[control_constraints_index_ + i*4 + 0]);
-        if(h_values_[control_constraints_index_ + i*4 + 1].second >= 0)
-          LOG_INFO_STREAM("knot " << i << " h(x) j - jmax " << h_values_[control_constraints_index_ + i*4 + 1].second << " lambda " << al_lambda_[control_constraints_index_ + i*4 + 1] << " rho " << rho_[control_constraints_index_ + i*4 + 1]);
-        if(h_values_[control_constraints_index_ + i*4 + 2].second >= 0)
-          LOG_INFO_STREAM("knot " << i << " h(x) drmin - dr " << h_values_[control_constraints_index_ + i*4 + 2].second << " lambda " << al_lambda_[control_constraints_index_ + i*4 + 2] << " rho " << rho_[control_constraints_index_ + i*4 + 2]);
-        if(h_values_[control_constraints_index_ + i*4 + 3].second >= 0)
-          LOG_INFO_STREAM("knot " << i << " h(x) dr - drmax " << h_values_[control_constraints_index_ + i*4 + 3].second << " lambda " << al_lambda_[control_constraints_index_ + i*4 + 3] << " rho " << rho_[control_constraints_index_ + i*4 + 3]);
-
-        for (int j = 0; j < config_.num_of_disc; j++) {
-          
-          // Left Lane Violation
-          if(h_values_[lane_constraints_index_ + lane].second >= 0)
-            LOG_INFO_STREAM("knot " << i << " disc " << j << " h(x) left lane" << h_values_[lane_constraints_index_ + lane].second << " lambda " << al_lambda_[lane_constraints_index_ + lane] << " rho " << rho_[lane_constraints_index_ + lane]);
-          lane++;
-
-          // Right Lane Violation
-          if(h_values_[lane_constraints_index_ + lane].second >= 0) 
-            LOG_INFO_STREAM("knot " << i << " disc " << j << " h(x) right lane" << h_values_[lane_constraints_index_ + lane].second << " lambda " << al_lambda_[lane_constraints_index_ + lane] << " rho " << rho_[lane_constraints_index_ + lane]);
-          lane++;
-
-
-          // Corridor Violation
-          for (const auto& c : cons) {
-            if(h_values_[corridor_constraints_index_ + corridor].second >= 0)
-              LOG_INFO_STREAM("knot " << i << ", disc " << j << ", corridor " << corridor << ", h(x) corridor " << h_values_[corridor_constraints_index_ + corridor].second << ", lambda " << al_lambda_[corridor_constraints_index_ + corridor] << ", rho " << rho_[corridor_constraints_index_ + corridor]);
-            corridor++;
-          }
-        }
-      }
-    }
+  }
 
   return total_cost;
 }
@@ -1046,10 +985,7 @@ DiscretizedTrajectory IlqrOptimizer::TransformToTrajectory(const std::vector<Sta
   return DiscretizedTrajectory(traj);
 }
 
-void IlqrOptimizer::iqr(
-    const DiscretizedTrajectory& coarse_traj,
-    std::vector<State>* const guess_state,
-    std::vector<Control>* const guess_control) {
+void IlqrOptimizer::iqr(const DiscretizedTrajectory& coarse_traj, std::vector<State>* const guess_state, std::vector<Control>* const guess_control) {
   guess_state->resize(num_of_knots_);
   guess_control->resize(num_of_knots_ - 1);
   
